@@ -1,0 +1,96 @@
+*,
+*::afterm *::before {
+  box-sizing: border-box;
+  border: 1px solid black;
+  background-color: lavender;
+}
+
+:root {
+  --cell-size: 150px;
+  --tick-size: calc(var(--cell-size) * 0.9);
+}
+
+body {
+  margin: 0;
+}
+
+/* !BOARD */
+.board {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  justify-items: center;
+  align-items: center;
+  gap: 5px;
+  grid-template-columns: repeat(3, auto);
+}
+
+.cell.x::before,
+.cell.x::after {
+  background-color: black;
+}
+
+.board.x .cell:not(.x):not(.circle):hover::before,
+.board.x .cell:not(.x):not(.circle):hover::after {
+  background-color: gray;
+}
+
+/* !CELLS */
+.cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  border: 2px solid black;
+}
+
+.cell.x,
+.cell.circle {
+  cursor: not-allowed;
+}
+
+/* !X-tick */
+.cell.x::before,
+.cell.x::after,
+.board.x .cell:not(.x):not(.circle):hover::before,
+.board.x .cell:not(.x):not(.circle):hover::after {
+  content: "";
+  position: absolute;
+  width: calc(var(--tick-size) * 0.15);
+  height: var(--tick-size);
+}
+
+.cell.x::before,
+.board.x .cell:not(.x):not(.circle):hover::before {
+  transform: rotate(45deg);
+}
+
+.cell.x::after,
+.board.x .cell:not(.x):not(.circle):hover::after {
+  transform: rotate(-45deg);
+}
+
+/* !CIRCLE-tick */
+.cell.circle::before,
+.cell.circle::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+
+.cell.circle::before {
+  width: var(--tick-size);
+  height: var(--tick-size);
+  background-color: black;
+}
+
+.cell.circle::after {
+  width: calc(var(--tick-size) * 0.7);
+  height: calc(var(--tick-size) * 0.7);
+  background-color: white;
+}
