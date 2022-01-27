@@ -28,12 +28,18 @@ body {
 }
 
 .cell.x::before,
-.cell.x::after {
+.cell.x::after,
+.cell.circle::before {
   background-color: black;
 }
 
+.cell.cell.circle::after {
+  background-color: white;
+}
+
 .board.x .cell:not(.x):not(.circle):hover::before,
-.board.x .cell:not(.x):not(.circle):hover::after {
+.board.x .cell:not(.x):not(.circle):hover::after,
+.board.circle .cell:not(.x):not(.circle):hover::before {
   background-color: gray;
 }
 
@@ -77,20 +83,64 @@ body {
 
 /* !CIRCLE-tick */
 .cell.circle::before,
-.cell.circle::after {
+.cell.circle::after,
+.board.circle .cell:not(.x):not(.circle):hover::before,
+.board.circle .cell:not(.x):not(.circle):hover:after {
   content: "";
   position: absolute;
   border-radius: 50%;
 }
 
-.cell.circle::before {
-  width: var(--tick-size);
-  height: var(--tick-size);
+.cell.circle::before,
+.board.circle .cell:not(.x):not(.circle):hover::before {
+  width: calc(var(--tick-size) * 0.9);
+  height: calc(var(--tick-size) * 0.9);
+}
+
+.cell.circle::after,
+.board.circle .cell:not(.x):not(.circle):hover:after {
+  width: calc(var(--tick-size) * 0.63);
+  height: calc(var(--tick-size) * 0.63);
+  background-color: white;
+}
+
+/* !Winning message */
+
+.winning_message {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  color: antiquewhite;
+  font-size: 4rem;
+  font-weight: 500;
+  font-family: monospace;
+}
+
+.winning_message button {
+  font-family: monospace;
+  font-size: 3rem;
+  font-weight: 700;
+
+  border: 2px solid white;
+  background-color: white;
+  color: black;
+  padding: 0.15em 0.5em;
+}
+
+.winning_message button:hover {
+  cursor: pointer;
+  color: white;
   background-color: black;
 }
 
-.cell.circle::after {
-  width: calc(var(--tick-size) * 0.7);
-  height: calc(var(--tick-size) * 0.7);
-  background-color: white;
+.winning_message.show {
+  display: flex;
 }

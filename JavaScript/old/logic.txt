@@ -28,4 +28,4 @@ function checkResult(array) {
 }
 
 //Check square is empty to play
-function checkSquare(array) {}
+function checkCell(array) {}
