@@ -1,4 +1,6 @@
-// TODO - ADD BOT FUNCTION
+// TODO(done) - ADD BOT FUNCTION
+// TODO(done) - CLICK CELLS FAST AND WIN, ADD RESTRICTION DURING BOT TURN
+// TODO - PLAYER SWITCHING BETWEEN TURNS, SHOULD REMAIN
 
 //Variables
 const playerOne = "x";
@@ -10,9 +12,11 @@ let playerTurn;
 //Button Elements
 const newGame_btn = document.getElementById("newGame_btn");
 const restart_btn = document.getElementById("restart_btn");
+const bot_btn = document.getElementById("bot_btn");
 
 //Elements
 const cellElements = document.querySelectorAll("[data-index]");
+const cellClassElements = document.querySelectorAll(".cell");
 const board = document.getElementById("board");
 const dataWinningMessage = document.querySelector("[data-winning-message]");
 const winningMessageElement = document.getElementById("winning_message");
@@ -37,10 +41,18 @@ startGame();
 //Button event listeners
 newGame_btn.addEventListener("click", startGame);
 restart_btn.addEventListener("click", restartGame);
+bot_btn.addEventListener("click", botBtnClicked, { once: true });
+
+//Adds clicked class to button element
+function botBtnClicked() {
+  bot_btn.classList.add("clicked");
+}
 
 //Initializing the game and also clears the board from previous game data.
 function startGame() {
-  playerTurn = Math.random() >= 0.5;
+  if (scoreOne || scoreTwo < 1) {
+    playerTurn = Math.random() >= 0.5;
+  }
   playerOneScore.textContent = scoreOne;
   playerTwoScore.textContent = scoreTwo;
   startMessage(playerTurn);
@@ -60,7 +72,7 @@ function startGame() {
 // calls on differnt functions in game logic based on player and cell data.
 function handleClick(e) {
   const cell = e.target;
-  const currentPlayer = playerTurn ? playerOne : playerTwo;
+  let currentPlayer = playerTurn ? playerOne : playerTwo;
   placeMark(cell, currentPlayer);
 
   if (checkWin(currentPlayer)) {
@@ -70,12 +82,19 @@ function handleClick(e) {
     endGame(true);
   } else {
     switchTurns();
-    boardHoverClass();
-    updateMessage(currentPlayer);
+    if (bot_btn.className === "bot_btn clicked") {
+      updateMessage(currentPlayer);
+      cellElements.forEach((cell) => {
+        cell.removeEventListener("click", handleClick);
+      });
+      botGame(currentPlayer);
+    } else {
+      boardHoverClass();
+      updateMessage(currentPlayer);
+    }
   }
 }
 
-//TODO - BUG: Score to currentplayer even if game ends in a draw.
 // Updates game score
 function updateScore(currentPlayer) {
   if (currentPlayer == playerOne) {
@@ -93,7 +112,7 @@ function startMessage(playerTurn) {
     playerMessage.textContent = "Circle Start";
   }
 }
-//Uppdates 'startMessage()' to show whos turn it is
+//Uppdates 'startMessage()' to show whos turn it is next
 // based on currentplayer variable.
 function updateMessage(currentPlayer) {
   if (currentPlayer == playerTwo) {
@@ -153,4 +172,36 @@ function endGame(draw) {
 // Reloads current html document.
 function restartGame() {
   return location.reload(true);
+}
+
+function botGame(currentPlayer) {
+  currentPlayer = playerTurn ? playerOne : playerTwo;
+  setTimeout(botPlayer, 1000, currentPlayer);
+}
+
+// Main BOT function, checks for empty cell and places mark at random.
+function botPlayer(currentPlayer) {
+  let cells = Array.from(cellElements);
+
+  let fullCells = [];
+  let emptyCells = [];
+
+  for (let i = 0; i < cells.length; i++) {
+    if (cells[i].className == "cell x" || cells[i].className == "cell circle") {
+      fullCells.push(i);
+    } else {
+      emptyCells.push(i);
+    }
+  }
+
+  let botTurn = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+
+  placeMark(cells[botTurn], currentPlayer);
+
+  switchTurns();
+  updateMessage(currentPlayer);
+  currentPlayer = playerTurn ? playerOne : playerTwo;
+  cellElements.forEach((cell) => {
+    cell.addEventListener("click", handleClick);
+  });
 }

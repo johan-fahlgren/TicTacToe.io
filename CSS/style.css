@@ -104,7 +104,7 @@ h3 {
   position: absolute;
   width: calc(var(--tick-size) * 0.15);
   height: var(--tick-size);
-  transition: ease-in 1s;
+  /* transition: ease-in 1s; */
 }
 
 .cell.x::before,
