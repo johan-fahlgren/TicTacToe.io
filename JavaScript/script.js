@@ -1,6 +1,9 @@
 // TODO(done) - ADD BOT FUNCTION
 // TODO(done) - CLICK CELLS FAST AND WIN, ADD RESTRICTION DURING BOT TURN
-// TODO - PLAYER SWITCHING BETWEEN TURNS, SHOULD REMAIN
+// TODO(done) - IF BOT WINS NOTHING HAPPENS
+// TODO - BUG - PLAYER SWITCHING BETWEEN TURNS, SHOULD REMAIN
+// TODO - BUG - BOT NEVER STARTS
+// TODO - BUG - setTimeout() not working(asynchronous function), alternative?
 
 //Variables
 const playerOne = "x";
@@ -8,6 +11,7 @@ const playerTwo = "circle";
 let scoreOne = 0;
 let scoreTwo = 0;
 let playerTurn;
+let currentPlayer;
 
 //Button Elements
 const newGame_btn = document.getElementById("newGame_btn");
@@ -45,14 +49,15 @@ bot_btn.addEventListener("click", botBtnClicked, { once: true });
 
 //Adds clicked class to button element
 function botBtnClicked() {
-  bot_btn.classList.add("clicked");
+  bot_btn.classList.add("bot");
 }
 
 //Initializing the game and also clears the board from previous game data.
 function startGame() {
-  if (scoreOne || scoreTwo < 1) {
+  if (scoreOne < 1 || scoreTwo < 1) {
     playerTurn = Math.random() >= 0.5;
   }
+  getNextPlayer();
   playerOneScore.textContent = scoreOne;
   playerTwoScore.textContent = scoreTwo;
   startMessage(playerTurn);
@@ -72,7 +77,7 @@ function startGame() {
 // calls on differnt functions in game logic based on player and cell data.
 function handleClick(e) {
   const cell = e.target;
-  let currentPlayer = playerTurn ? playerOne : playerTwo;
+
   placeMark(cell, currentPlayer);
 
   if (checkWin(currentPlayer)) {
@@ -81,17 +86,30 @@ function handleClick(e) {
   } else if (isDraw()) {
     endGame(true);
   } else {
-    switchTurns();
-    if (bot_btn.className === "bot_btn clicked") {
-      updateMessage(currentPlayer);
+    getNextPlayer();
+    updateMessage(currentPlayer);
+
+    if (bot_btn.className === "bot_btn bot") {
       cellElements.forEach((cell) => {
         cell.removeEventListener("click", handleClick);
       });
-      botGame(currentPlayer);
-    } else {
-      boardHoverClass();
-      updateMessage(currentPlayer);
+
+      botPlayer(currentPlayer);
+
+      if (checkWin(currentPlayer)) {
+        updateScore(currentPlayer);
+        endGame(false);
+      } else if (isDraw()) {
+        endGame(true);
+      } else {
+        getNextPlayer();
+        cellElements.forEach((cell) => {
+          cell.addEventListener("click", handleClick);
+        });
+      }
     }
+    updateMessage(currentPlayer);
+    boardHoverClass();
   }
 }
 
@@ -115,7 +133,7 @@ function startMessage(playerTurn) {
 //Uppdates 'startMessage()' to show whos turn it is next
 // based on currentplayer variable.
 function updateMessage(currentPlayer) {
-  if (currentPlayer == playerTwo) {
+  if (currentPlayer == playerOne) {
     playerMessage.textContent = "X's Turn";
   } else {
     playerMessage.textContent = "Circle's Turn";
@@ -127,8 +145,10 @@ function placeMark(cell, currentPlayer) {
 }
 
 // Switches between players every turn if there is no win or draw.
-function switchTurns() {
+function getNextPlayer() {
   playerTurn = !playerTurn;
+  currentPlayer = playerTurn ? playerOne : playerTwo;
+  return currentPlayer;
 }
 // Adds hover effect to cell to show current mark/player.
 function boardHoverClass() {
@@ -143,11 +163,18 @@ function boardHoverClass() {
 
 // Checks trough all the cells and sees if there is a match with 'win' array.
 function checkWin(currentPlayer) {
-  return win.some((combinations) => {
-    return combinations.every((index) => {
-      return cellElements[index].classList.contains(currentPlayer);
-    });
-  });
+  for (let combination of win) {
+    let sum = 0;
+    for (let index of combination) {
+      if (cellElements[index].classList.contains(currentPlayer)) {
+        sum++;
+      }
+    }
+    if (sum === 3) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // Checks if every cell has either a playerOne och playerTwo class inside.
@@ -174,15 +201,9 @@ function restartGame() {
   return location.reload(true);
 }
 
-function botGame(currentPlayer) {
-  currentPlayer = playerTurn ? playerOne : playerTwo;
-  setTimeout(botPlayer, 1000, currentPlayer);
-}
-
 // Main BOT function, checks for empty cell and places mark at random.
 function botPlayer(currentPlayer) {
   let cells = Array.from(cellElements);
-
   let fullCells = [];
   let emptyCells = [];
 
@@ -195,13 +216,24 @@ function botPlayer(currentPlayer) {
   }
 
   let botTurn = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-
   placeMark(cells[botTurn], currentPlayer);
-
-  switchTurns();
-  updateMessage(currentPlayer);
-  currentPlayer = playerTurn ? playerOne : playerTwo;
-  cellElements.forEach((cell) => {
-    cell.addEventListener("click", handleClick);
-  });
 }
+
+/* async function sleep() {
+  console.log("start timer");
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  console.log("after 1 second");
+} */
+
+/* function sleep(milliseconds) {
+  const date = Date.now();
+  let currentDate = null;
+  do {
+    currentDate = Date.now();
+  } while (currentDate - date < milliseconds);
+} */
+
+/* function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+ */
