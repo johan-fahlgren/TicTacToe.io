@@ -95,7 +95,6 @@ function handleClick(e) {
       });
 
       botPlayer(currentPlayer);
-
       if (checkWin(currentPlayer)) {
         updateScore(currentPlayer);
         endGame(false);
