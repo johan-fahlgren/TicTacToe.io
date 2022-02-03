@@ -1,0 +1,269 @@
+*,
+*::after *::before {
+  box-sizing: border-box;
+  border: 1px solid black;
+  background-color: white;
+}
+
+:root {
+  --cell-size: 150px;
+  --tick-size: calc(var(--cell-size) * 0.9);
+}
+
+body {
+  margin: 0;
+  background-color: wheat;
+}
+
+.game_container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+h1 {
+  font-family: monospace;
+  font-size: 4rem;
+  margin: 0;
+}
+
+h2 {
+  font-family: monospace;
+  font-size: 5rem;
+  margin: 0;
+}
+
+h3 {
+  font-family: monospace;
+  font-size: 4rem;
+  margin: 0;
+}
+
+.title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  padding-bottom: 40px;
+}
+
+.score {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  padding-bottom: 40px;
+}
+
+.information {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  padding-top: 40px;
+}
+
+/* !BOARD */
+.board {
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  justify-items: center;
+  align-items: center;
+  grid-template-columns: repeat(3, auto);
+}
+
+.cell.x::before,
+.cell.x::after,
+.cell.circle::before {
+  background-color: black;
+}
+
+.cell.cell.circle::after {
+  background-color: wheat;
+}
+
+.board.x .cell:not(.x):not(.circle):hover::before,
+.board.x .cell:not(.x):not(.circle):hover::after,
+.board.circle .cell:not(.x):not(.circle):hover::before {
+  background-color: darkgoldenrod;
+  opacity: 0.3;
+}
+
+/* !CELLS */
+.cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  border: 3px solid black;
+}
+
+.cell.x,
+.cell.circle {
+  cursor: not-allowed;
+}
+
+/* !X-tick */
+.cell.x::before,
+.cell.x::after,
+.board.x .cell:not(.x):not(.circle):hover::before,
+.board.x .cell:not(.x):not(.circle):hover::after {
+  content: "";
+  position: absolute;
+  width: calc(var(--tick-size) * 0.15);
+  height: var(--tick-size);
+  /* transition: ease-in 1s; */
+}
+
+.cell.x::before,
+.board.x .cell:not(.x):not(.circle):hover::before {
+  transform: rotate(45deg);
+}
+
+.cell.x::after,
+.board.x .cell:not(.x):not(.circle):hover::after {
+  transform: rotate(-45deg);
+}
+
+/* !CIRCLE-tick */
+.cell.circle::before,
+.cell.circle::after,
+.board.circle .cell:not(.x):not(.circle):hover::before,
+.board.circle .cell:not(.x):not(.circle):hover:after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+
+.cell.circle::before,
+.board.circle .cell:not(.x):not(.circle):hover::before {
+  width: calc(var(--tick-size) * 0.9);
+  height: calc(var(--tick-size) * 0.9);
+}
+
+.cell.circle::after,
+.board.circle .cell:not(.x):not(.circle):hover:after {
+  width: calc(var(--tick-size) * 0.63);
+  height: calc(var(--tick-size) * 0.63);
+  background-color: wheat;
+}
+
+/* !Winning message */
+
+.winning_message {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  color: antiquewhite;
+  font-size: 4rem;
+  font-weight: 500;
+  font-family: monospace;
+}
+
+.winning_message button {
+  font-family: monospace;
+  font-size: 3rem;
+  font-weight: 700;
+
+  border: 2px solid white;
+  background-color: white;
+  color: black;
+  padding: 0.15em 0.5em;
+}
+
+/* BUTTONS */
+.winning_message button:hover {
+  cursor: pointer;
+  color: white;
+  background-color: black;
+}
+
+.buttons {
+  padding-top: 40px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+.restart_btn {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: monospace;
+  font-size: 2rem;
+  font-weight: 700;
+  width: 180px;
+
+  border: 2px solid black;
+  background-color: whitesmoke;
+  color: black;
+  padding: 0.15em 0.5em;
+}
+.restart_btn:hover {
+  cursor: pointer;
+  color: white;
+  background-color: black;
+}
+
+.bot_btn {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: monospace;
+  font-size: 2rem;
+  font-weight: 700;
+  width: 180px;
+
+  border: 2px solid black;
+  background-color: whitesmoke;
+  color: black;
+  padding: 0.15em 0.5em;
+}
+
+.bot_btn:hover {
+  cursor: pointer;
+  color: white;
+  background-color: black;
+}
+
+/* WINNING MESSAGE */
+.winning_message.show {
+  display: flex;
+}
+
+/* BORDER REMOVAL BOARD */
+.cell:first-child,
+.cell:nth-child(2),
+.cell:nth-child(3) {
+  border-top: none;
+}
+
+.cell:nth-child(3n + 1) {
+  border-left: none;
+}
+
+.cell:nth-child(3n + 3) {
+  border-right: none;
+}
+
+.cell:last-child,
+.cell:nth-child(7),
+.cell:nth-child(8) {
+  border-bottom: none;
+}
