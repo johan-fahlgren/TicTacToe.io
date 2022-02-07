@@ -1,3 +1,6 @@
+import { coreLogic } from "./coreLogic.js";
+const core = new coreLogic();
+
 // TODO(done) - ADD BOT FUNCTION
 // TODO(done) - CLICK CELLS FAST AND WIN, ADD RESTRICTION DURING BOT TURN
 // TODO(done) - IF BOT WINS NOTHING HAPPENS
@@ -6,12 +9,10 @@
 // TODO - BUG - setTimeout() not working(asynchronous function), alternative?
 
 //Variables
-const playerOne = "x";
-const playerTwo = "circle";
-let scoreOne = 0;
-let scoreTwo = 0;
-let playerTurn;
-let currentPlayer;
+core.playerOne = "x";
+core.playerTwo = "circle";
+core.scoreOne = 0;
+core.scoreTwo = 0;
 
 //Button Elements
 const newGame_btn = document.getElementById("newGame_btn");
@@ -28,20 +29,6 @@ const playerOneScore = document.querySelector(".playerOneScore");
 const playerTwoScore = document.querySelector(".playerTwoScore");
 const playerMessage = document.querySelector(".player_Message");
 
-// Winning patterns
-const win = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [0, 3, 6],
-  [1, 4, 7],
-  [2, 5, 8],
-  [0, 4, 8],
-  [2, 4, 6],
-];
-
-startGame();
-
 //Button event listeners
 newGame_btn.addEventListener("click", startGame);
 restart_btn.addEventListener("click", restartGame);
@@ -52,19 +39,21 @@ function botBtnClicked() {
   bot_btn.classList.add("bot");
 }
 
+startGame();
+
 //Initializing the game and also clears the board from previous game data.
 function startGame() {
-  if (scoreOne < 1 || scoreTwo < 1) {
-    playerTurn = Math.random() >= 0.5;
+  if (core.scoreOne < 1 || core.scoreTwo < 1) {
+    core.playerTurn = Math.random() >= 0.5;
   }
-  getNextPlayer();
-  playerOneScore.textContent = scoreOne;
-  playerTwoScore.textContent = scoreTwo;
-  startMessage(playerTurn);
+  core.getNextPlayer(core.playerTurn);
+  playerOneScore.textContent = core.scoreOne;
+  playerTwoScore.textContent = core.scoreTwo;
+  startMessage(core.playerTurn);
 
   cellElements.forEach((cell) => {
-    cell.classList.remove(playerOne);
-    cell.classList.remove(playerTwo);
+    cell.classList.remove(core.playerOne);
+    cell.classList.remove(core.playerTwo);
     cell.removeEventListener("click", handleClick);
     cell.addEventListener("click", handleClick, { once: true });
   });
@@ -78,94 +67,95 @@ function startGame() {
 function handleClick(e) {
   const cell = e.target;
 
-  placeMark(cell, currentPlayer);
+  placeMark(cell, core.currentPlayer);
 
-  if (checkWin(currentPlayer)) {
-    updateScore(currentPlayer);
+  if (checkWin(core.currentPlayer)) {
+    updateScore(core.currentPlayer);
     endGame(false);
   } else if (isDraw()) {
     endGame(true);
   } else {
-    getNextPlayer();
-    updateMessage(currentPlayer);
+    core.getNextPlayer();
+    updateMessage(core.currentPlayer);
 
     if (bot_btn.className === "bot_btn bot") {
       cellElements.forEach((cell) => {
         cell.removeEventListener("click", handleClick);
       });
 
-      botPlayer(currentPlayer);
-      if (checkWin(currentPlayer)) {
-        updateScore(currentPlayer);
+      botPlayer(core.currentPlayer);
+      if (checkWin(core.currentPlayer)) {
+        updateScore(core.currentPlayer);
         endGame(false);
       } else if (isDraw()) {
         endGame(true);
       } else {
-        getNextPlayer();
+        core.getNextPlayer();
         cellElements.forEach((cell) => {
           cell.addEventListener("click", handleClick);
         });
       }
     }
-    updateMessage(currentPlayer);
+    updateMessage(core.currentPlayer);
     boardHoverClass();
   }
 }
 
+//GLUECODE
 // Updates game score
 function updateScore(currentPlayer) {
-  if (currentPlayer == playerOne) {
-    playerOneScore.textContent = scoreOne++;
+  if (core.currentPlayer == core.playerOne) {
+    playerOneScore.textContent = core.updateScoreOne();
   } else {
-    playerTwoScore.textContent = scoreTwo++;
+    playerTwoScore.textContent = core.updateScoreTwo();
   }
 }
 
+//GLUECODE
 //Initializing which player got the first move/starts.
 function startMessage(playerTurn) {
-  if (playerTurn === true) {
+  if (core.playerTurn === true) {
     playerMessage.textContent = "X Start";
   } else {
     playerMessage.textContent = "Circle Start";
   }
 }
+
+//GLUECODE
 //Uppdates 'startMessage()' to show whos turn it is next
-// based on currentplayer variable.
+// based on currentPlayer variable.
 function updateMessage(currentPlayer) {
-  if (currentPlayer == playerOne) {
+  if (core.currentPlayer == core.playerOne) {
     playerMessage.textContent = "X's Turn";
   } else {
     playerMessage.textContent = "Circle's Turn";
   }
 }
+
+//GLUECODE
 // Adds class to cell in order to put down an X or circle.
 function placeMark(cell, currentPlayer) {
-  cell.classList.add(currentPlayer);
+  cell.classList.add(core.currentPlayer);
 }
 
-// Switches between players every turn if there is no win or draw.
-function getNextPlayer() {
-  playerTurn = !playerTurn;
-  currentPlayer = playerTurn ? playerOne : playerTwo;
-  return currentPlayer;
-}
+//GLUECODE
 // Adds hover effect to cell to show current mark/player.
 function boardHoverClass() {
-  board.classList.remove(playerOne);
-  board.classList.remove(playerTwo);
-  if (playerTurn) {
-    board.classList.add(playerOne);
+  board.classList.remove(core.playerOne);
+  board.classList.remove(core.playerTwo);
+  if (core.playerTurn) {
+    board.classList.add(core.playerOne);
   } else {
-    board.classList.add(playerTwo);
+    board.classList.add(core.playerTwo);
   }
 }
 
 // Checks trough all the cells and sees if there is a match with 'win' array.
 function checkWin(currentPlayer) {
-  for (let combination of win) {
+  for (let combination of core.win) {
     let sum = 0;
     for (let index of combination) {
-      if (cellElements[index].classList.contains(currentPlayer)) {
+      if (cellElements[index].classList.contains(core.currentPlayer)) {
         sum++;
       }
     }
@@ -180,7 +170,8 @@ function checkWin(currentPlayer) {
 function isDraw() {
   return [...cellElements].every((cell) => {
     return (
-      cell.classList.contains(playerOne) || cell.classList.contains(playerTwo)
+      cell.classList.contains(core.playerOne) ||
+      cell.classList.contains(core.playerTwo)
     );
   });
 }
@@ -190,7 +181,7 @@ function endGame(draw) {
   if (draw) {
     dataWinningMessage.textContent = "Draw!";
   } else {
-    dataWinningMessage.textContent = `${playerTurn ? "X's" : "O's"} Win!`;
+    dataWinningMessage.textContent = `${core.playerTurn ? "X's" : "O's"} Win!`;
   }
   winningMessageElement.classList.add("show");
 }
@@ -215,24 +206,5 @@ function botPlayer(currentPlayer) {
   }
 
   let botTurn = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-  placeMark(cells[botTurn], currentPlayer);
+  placeMark(cells[botTurn], core.currentPlayer);
 }
-
-/* async function sleep() {
-  console.log("start timer");
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  console.log("after 1 second");
-} */
-
-/* function sleep(milliseconds) {
-  const date = Date.now();
-  let currentDate = null;
-  do {
-    currentDate = Date.now();
-  } while (currentDate - date < milliseconds);
-} */
-
-/* function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
- */
