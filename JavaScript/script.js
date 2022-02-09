@@ -1,18 +1,12 @@
 import { coreLogic } from "./coreLogic.js";
-const core = new coreLogic();
+const core = new coreLogic("x", "circle");
 
 // TODO(done) - ADD BOT FUNCTION
 // TODO(done) - CLICK CELLS FAST AND WIN, ADD RESTRICTION DURING BOT TURN
 // TODO(done) - IF BOT WINS NOTHING HAPPENS
+// TODO(done) - BOT TURN TO FAST. (setTimeout() is an asynchronous function).
 // TODO - BUG - PLAYER SWITCHING BETWEEN TURNS, SHOULD REMAIN
 // TODO - BUG - BOT NEVER STARTS
-// TODO - BUG - setTimeout() not working(asynchronous function), alternative?
-
-//Variables
-core.playerOne = "x";
-core.playerTwo = "circle";
-core.scoreOne = 0;
-core.scoreTwo = 0;
 
 //Button Elements
 const newGame_btn = document.getElementById("newGame_btn");
@@ -21,7 +15,6 @@ const bot_btn = document.getElementById("bot_btn");
 
 //Elements
 const cellElements = document.querySelectorAll("[data-index]");
-const cellClassElements = document.querySelectorAll(".cell");
 const board = document.getElementById("board");
 const dataWinningMessage = document.querySelector("[data-winning-message]");
 const winningMessageElement = document.getElementById("winning_message");
@@ -69,10 +62,10 @@ function handleClick(e) {
 
   placeMark(cell, core.currentPlayer);
 
-  if (checkWin(core.currentPlayer)) {
+  if (core.checkWin(getPlayerCellElement())) {
     updateScore(core.currentPlayer);
     endGame(false);
-  } else if (isDraw()) {
+  } else if (core.isDraw(getPlayerCellElement())) {
     endGame(true);
   } else {
     core.getNextPlayer();
@@ -83,62 +76,60 @@ function handleClick(e) {
         cell.removeEventListener("click", handleClick);
       });
 
-      botPlayer(core.currentPlayer);
-      if (checkWin(core.currentPlayer)) {
-        updateScore(core.currentPlayer);
-        endGame(false);
-      } else if (isDraw()) {
-        endGame(true);
-      } else {
-        core.getNextPlayer();
-        cellElements.forEach((cell) => {
-          cell.addEventListener("click", handleClick);
-        });
-      }
+      setTimeout(function () {
+        botPlayer(core.currentPlayer);
+        if (core.checkWin(getPlayerCellElement())) {
+          updateScore(core.currentPlayer);
+          endGame(false);
+        } else if (core.isDraw(getPlayerCellElement())) {
+          endGame(true);
+        } else {
+          core.getNextPlayer();
+          cellElements.forEach((cell) => {
+            cell.addEventListener("click", handleClick);
+          });
+        }
+        updateMessage(core.currentPlayer);
+      }, 1000);
     }
     updateMessage(core.currentPlayer);
     boardHoverClass();
   }
 }
 
-//GLUECODE
 // Updates game score
 function updateScore(currentPlayer) {
-  if (core.currentPlayer == core.playerOne) {
+  if (currentPlayer == core.playerOne) {
     playerOneScore.textContent = core.updateScoreOne();
   } else {
     playerTwoScore.textContent = core.updateScoreTwo();
   }
 }
 
-//GLUECODE
 //Initializing which player got the first move/starts.
 function startMessage(playerTurn) {
-  if (core.playerTurn === true) {
+  if (playerTurn === true) {
     playerMessage.textContent = "X Start";
   } else {
     playerMessage.textContent = "Circle Start";
   }
 }
 
-//GLUECODE
-//Uppdates 'startMessage()' to show whos turn it is next
+// Uppdates 'startMessage()' to show whos turn it is next
 // based on currentPlayer variable.
 function updateMessage(currentPlayer) {
-  if (core.currentPlayer == core.playerOne) {
+  if (currentPlayer == core.playerOne) {
     playerMessage.textContent = "X's Turn";
   } else {
     playerMessage.textContent = "Circle's Turn";
   }
 }
 
-//GLUECODE
 // Adds class to cell in order to put down an X or circle.
 function placeMark(cell, currentPlayer) {
-  cell.classList.add(core.currentPlayer);
+  cell.classList.add(currentPlayer);
 }
 
-//GLUECODE
 // Adds hover effect to cell to show current mark/player.
 function boardHoverClass() {
   board.classList.remove(core.playerOne);
@@ -150,30 +141,17 @@ function boardHoverClass() {
   }
 }
 
-// Checks trough all the cells and sees if there is a match with 'win' array.
-function checkWin(currentPlayer) {
-  for (let combination of core.win) {
-    let sum = 0;
-    for (let index of combination) {
-      if (cellElements[index].classList.contains(core.currentPlayer)) {
-        sum++;
-      }
-    }
-    if (sum === 3) {
-      return true;
+// Gets player html class from cellelemtens and adds to list.
+function getPlayerCellElement() {
+  let playerCells = [];
+  for (let playerclass of cellElements) {
+    if (playerclass.classList.length > 1) {
+      playerCells.push(playerclass.classList[1]);
+    } else {
+      playerCells.push(null);
     }
   }
-  return false;
-}
-
-// Checks if every cell has either a playerOne och playerTwo class inside.
-function isDraw() {
-  return [...cellElements].every((cell) => {
-    return (
-      cell.classList.contains(core.playerOne) ||
-      cell.classList.contains(core.playerTwo)
-    );
-  });
+  return playerCells;
 }
 
 // Outputs winning message based on a bool from check win and isdraw result.
@@ -206,5 +184,5 @@ function botPlayer(currentPlayer) {
   }
 
   let botTurn = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-  placeMark(cells[botTurn], core.currentPlayer);
+  placeMark(cells[botTurn], currentPlayer);
 }

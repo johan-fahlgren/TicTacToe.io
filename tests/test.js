@@ -5,9 +5,11 @@ describe("coreLogic class", function () {
   describe("Update Score playerOne", function () {
     it("updateScoreOne()", function () {
       const core = new coreLogic();
-      core.scoreOne = 0;
+      core.scoreOne = 3;
+      assert.equal(core.scoreOne, 3);
+      //Update score with +1.
       core.updateScoreOne();
-      assert.equal(core.scoreOne, 1);
+      assert.equal(core.scoreOne, 4);
     });
   });
   /* TEST - updateScoreTwo */
@@ -15,8 +17,10 @@ describe("coreLogic class", function () {
     it("updateScoreTwo()", function () {
       const core = new coreLogic();
       core.scoreTwo = 4;
+      //Update score with +1.
       core.updateScoreTwo();
       assert.equal(core.scoreTwo, 5);
+      //Update score with +1 again.
       core.updateScoreTwo();
       assert.equal(core.scoreTwo, 6);
     });
@@ -25,17 +29,18 @@ describe("coreLogic class", function () {
   describe("Change Player turn", function () {
     it("getNextPlayer()", function () {
       const core = new coreLogic();
-      core.playerTurn = true;
+      core.playerTurn = true; //Start with player "x" (true)
       core.playerOne = "x";
       core.playerTwo = "circle";
       core.currentPlayer = null;
-      //Start with player "x" (true)
+      //Change to nextplayer "circle" / playerTwo
       core.getNextPlayer();
-      //Change to nextplayer "circle"
-      assert.equal(core.currentPlayer, "circle");
+      assert.strictEqual(core.playerTurn, false, "playerTwo");
+      assert.equal(core.currentPlayer, "circle", "playerTwo");
+      //Change player again to "x"  / playerOne
       core.getNextPlayer();
-      //Change again nextplayer "x"
-      assert.equal(core.currentPlayer, "x");
+      assert.strictEqual(core.playerTurn, true, "playerOne");
+      assert.equal(core.currentPlayer, "x", "playerOne");
     });
   });
 });
