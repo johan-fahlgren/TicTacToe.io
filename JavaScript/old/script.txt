@@ -1,5 +1,0 @@
-import { logic } from "./logic";
-
-const draw_o = "O";
-const draw_x = "X";
-let curerntPlayer = function draw() {};
