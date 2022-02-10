@@ -1,3 +1,5 @@
+// TODO - (done) - GÖR OM TILL EN `updateScore()` metod.
+
 /**
  * @file Tic-Tac-Toe Game logic
  * @author Johan Fahlgren
@@ -39,7 +41,7 @@ export class coreLogic {
   /**
    * Method used to switches between players every turn if there is no win
    * or draw.
-   * @returns {object} - playerOne or PlayerTwo.
+   * @returns {string} playerOne || PlayerTwo.
    */
   getNextPlayer() {
     this.playerTurn = !this.playerTurn;
@@ -48,19 +50,21 @@ export class coreLogic {
     return this.currentPlayer;
   }
 
-  // TODO GÖR OM TILL EN `updateScore()`
   /**
-   * Method updates scoreOne and adds one point to the score.
+   * Method updates score for currentplayer and saves it to localstorage.
+   * @param {object} currentPlayer - playerOne or playerTwo.
+   * @returns {number|number} scoreOne || scoreTwo - current score as number.
    */
-  updateScoreOne() {
-    this.scoreOne++;
-  }
-
-  /**
-   * Method updates scoreTwo and adds one point to the score.
-   */
-  updateScoreTwo() {
-    this.scoreTwo++;
+  updateScore(currentPlayer) {
+    if (currentPlayer == this.playerOne) {
+      this.scoreOne++;
+      localStorage.setItem("playerOneScore", this.scoreOne);
+      return this.scoreOne;
+    } else {
+      this.scoreTwo++;
+      localStorage.setItem("playerTwoScore", this.scoreTwo);
+      return this.scoreTwo;
+    }
   }
 
   /**

@@ -1,4 +1,5 @@
 import { coreLogic } from "./coreLogic.js";
+import "./Util.js";
 const core = new coreLogic("x", "circle");
 
 // TODO(done) - ADD BOT FUNCTION
@@ -8,6 +9,13 @@ const core = new coreLogic("x", "circle");
 // TODO - BUG - PLAYER SWITCHING BETWEEN TURNS, SHOULD REMAIN
 // TODO - BUG - BOT NEVER STARTS
 
+//LOCALSTORAGE
+if (localStorage.getItem("playerOneScore") !== null) {
+  core.scoreOne = localStorage.getObjekt("playerOneScore");
+}
+if (localStorage.getItem("playerTwoScore") !== null) {
+  core.scoreTwo = localStorage.getObjekt("playerTwoScore");
+}
 //Button Elements
 const newGame_btn = document.getElementById("newGame_btn");
 const restart_btn = document.getElementById("restart_btn");
@@ -30,6 +38,7 @@ bot_btn.addEventListener("click", botBtnClicked, { once: true });
 //Adds clicked class to button element
 function botBtnClicked() {
   bot_btn.classList.add("bot");
+  bot_btn.style.backgroundColor = "green";
 }
 
 startGame();
@@ -57,13 +66,13 @@ function startGame() {
 // Takes in click parameter from EventListener
 // Adds currentPlayer from playerTurn
 // calls on differnt functions in game logic based on player and cell data.
-function handleClick(e) {
-  const cell = e.target;
+function handleClick(event) {
+  const cell = event.target;
 
   placeMark(cell, core.currentPlayer);
 
   if (core.checkWin(getPlayerCellElement())) {
-    updateScore(core.currentPlayer);
+    updateScoreElement(core.currentPlayer);
     endGame(false);
   } else if (core.isDraw(getPlayerCellElement())) {
     endGame(true);
@@ -79,7 +88,7 @@ function handleClick(e) {
       setTimeout(function () {
         botPlayer(core.currentPlayer);
         if (core.checkWin(getPlayerCellElement())) {
-          updateScore(core.currentPlayer);
+          updateScoreElement(core.currentPlayer);
           endGame(false);
         } else if (core.isDraw(getPlayerCellElement())) {
           endGame(true);
@@ -89,20 +98,21 @@ function handleClick(e) {
             cell.addEventListener("click", handleClick);
           });
         }
+        boardHoverClass();
         updateMessage(core.currentPlayer);
       }, 1000);
     }
-    updateMessage(core.currentPlayer);
+
     boardHoverClass();
   }
 }
 
-// Updates game score
-function updateScore(currentPlayer) {
+// Updates game score element.
+function updateScoreElement(currentPlayer) {
   if (currentPlayer == core.playerOne) {
-    playerOneScore.textContent = core.updateScoreOne();
+    playerOneScore.textContent = core.updateScore(currentPlayer);
   } else {
-    playerTwoScore.textContent = core.updateScoreTwo();
+    playerTwoScore.textContent = core.updateScore(currentPlayer);
   }
 }
 
@@ -166,6 +176,7 @@ function endGame(draw) {
 
 // Reloads current html document.
 function restartGame() {
+  localStorage.clear();
   return location.reload(true);
 }
 
