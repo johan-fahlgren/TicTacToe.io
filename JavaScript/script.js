@@ -11,10 +11,10 @@ const core = new coreLogic("x", "circle");
 
 //LOCALSTORAGE
 if (localStorage.getItem("playerOneScore") !== null) {
-  core.scoreOne = localStorage.getObjekt("playerOneScore");
+  core.scoreOne = localStorage.getObject("playerOneScore");
 }
 if (localStorage.getItem("playerTwoScore") !== null) {
-  core.scoreTwo = localStorage.getObjekt("playerTwoScore");
+  core.scoreTwo = localStorage.getObject("playerTwoScore");
 }
 //Button Elements
 const newGame_btn = document.getElementById("newGame_btn");
@@ -40,9 +40,7 @@ function botBtnClicked() {
   bot_btn.classList.add("bot");
   bot_btn.style.backgroundColor = "green";
 }
-
 startGame();
-
 //Initializing the game and also clears the board from previous game data.
 function startGame() {
   if (core.scoreOne < 1 || core.scoreTwo < 1) {
