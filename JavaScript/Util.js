@@ -3,7 +3,7 @@
  * @param {string} key - localStorage store key
  * @returns {object} parsed object
  */
-Storage.prototype.getObjekt = function (key) {
+Storage.prototype.getObject = function (key) {
   return JSON.parse(this.getItem(key));
 };
 
